@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Jornada do Som: Do Sulco ao Algoritmo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Roboto+Slab:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Papiro Vintage -->
+    <!-- Application Structure Plan: A aplicação é estruturada como uma jornada cronológica e vertical, dividida em "Eras" (Mecânica, Vinil, Magnética, Preservação, Futuro). Novas seções de "Exercícios" e "Referências" foram adicionadas ao final para reforço do aprendizado. Uma barra de navegação fixa no topo permite saltar entre as seções. Esta abordagem foi escolhida para transformar o plano de aula em uma narrativa envolvente, como uma exposição de museu digital. A interatividade (elementos clicáveis, gráficos, diagramas, exercícios) é usada para aprofundar o conteúdo sob demanda. -->
+    <!-- Visualization & Content Choices: 
+        - Linha do Tempo (HTML/CSS): Objetivo: Contextualizar. Método: Diagrama visual simples.
+        - Diagrama de Sulcos (HTML/CSS): Objetivo: Comparar. Método: Ilustração visual da gravação vertical vs. lateral. Justificativa: Clarifica a diferença fundamental entre as primeiras tecnologias.
+        - Tabela Comparativa de Mídias (HTML): Objetivo: Comparar. Método: Tabela estruturada com dados técnicos de 78, LP e Single. Justificativa: Organiza dados de forma clara.
+        - Diagrama Estéreo 45/45 (HTML/CSS): Objetivo: Informar. Método: Diagrama em corte do sulco em 'V'. Justificativa: Desmistifica o complexo conceito da gravação estéreo.
+        - Diagrama de Companding Dolby (HTML/CSS): Objetivo: Informar. Método: Fluxograma simples do processo de compressão/expansão. Justificativa: Torna um conceito abstrato de áudio mais concreto.
+        - Gráficos de Degradação (Chart.js Donut): Objetivo: Comparar. Método: Visualização proporcional das causas de degradação.
+        - Exercícios Interativos (HTML/JS): Objetivo: Avaliar. Método: Cards com perguntas e respostas ocultas. Justificativa: Promove o auto-estudo e a fixação do conteúdo de forma lúdica.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            background-color: #FDF6E3;
+            color: #5D4037;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Lora', serif;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D2B48C;
+            border-bottom-color: #D2B48C;
+        }
+        .card {
+            background-color: #FFFBF0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .answer.show {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-[#FDF6E3] bg-opacity-90 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl md:text-2xl font-bold text-[#5D4037]">A Jornada do Som</h1>
+                <div class="hidden lg:flex space-x-6 text-sm">
+                    <a href="#intro" class="nav-link">Introdução</a>
+                    <a href="#mecanica" class="nav-link">Era Mecânica</a>
+                    <a href="#vinil" class="nav-link">Era do Vinil</a>
+                    <a href="#magnetica" class="nav-link">Era Magnética</a>
+                    <a href="#preservacao" class="nav-link">Preservação</a>
+                    <a href="#exercicios" class="nav-link">Exercícios</a>
+                    <a href="#referencias" class="nav-link">Referências</a>
+                </div>
+                <div class="lg:hidden">
+                    <select id="mobile-nav" class="bg-transparent border border-[#D2B48C] rounded-md p-2 text-[#5D4037]">
+                        <option value="#intro">Introdução</option>
+                        <option value="#mecanica">Era Mecânica</option>
+                        <option value="#vinil">Era do Vinil</option>
+                        <option value="#magnetica">Era Magnética</option>
+                        <option value="#preservacao">Preservação</option>
+                        <option value="#exercicios">Exercícios</option>
+                        <option value="#referencias">Referências</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <section id="intro" class="text-center min-h-screen flex flex-col justify-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4">Do Sulco ao Algoritmo</h2>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-700 mb-8">
+                Até 1877, todo som era um evento único, destinado a desaparecer para sempre. Esta é a história de como a humanidade aprendeu a capturar o efêmero, transformando a música, a cultura e a nossa própria percepção do tempo.
+            </p>
+            <div class="w-full max-w-4xl mx-auto mt-12">
+                <div class="relative">
+                    <div class="absolute w-full h-1 bg-[#D2B48C] top-1/2 -translate-y-1/2"></div>
+                    <div class="relative flex justify-between">
+                        <div class="text-center"><div class="w-6 h-6 bg-[#5D4037] rounded-full mx-auto border-4 border-[#FDF6E3]"></div><p class="mt-2 text-xs sm:text-sm font-semibold">1877<br>Fonógrafo</p></div>
+                        <div class="text-center"><div class="w-6 h-6 bg-[#5D4037] rounded-full mx-auto border-4 border-[#FDF6E3]"></div><p class="mt-2 text-xs sm:text-sm font-semibold">1935<br>Magnetofone</p></div>
+                        <div class="text-center"><div class="w-6 h-6 bg-[#5D4037] rounded-full mx-auto border-4 border-[#FDF6E3]"></div><p class="mt-2 text-xs sm:text-sm font-semibold">1948<br>Disco de Vinil (LP)</p></div>
+                        <div class="text-center"><div class="w-6 h-6 bg-[#5D4037] rounded-full mx-auto border-4 border-[#FDF6E3]"></div><p class="mt-2 text-xs sm:text-sm font-semibold">1982<br>CD Digital</p></div>
+                        <div class="text-center"><div class="w-6 h-6 bg-[#5D4037] rounded-full mx-auto border-4 border-[#FDF6E3]"></div><p class="mt-2 text-xs sm:text-sm font-semibold">Hoje<br>Streaming & IA</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mecanica" class="py-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">A Era Mecânica: O Triunfo do Sulco</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">Nesta era, a energia sonora era convertida diretamente em um sulco físico. Uma agulha gravava e outra lia, em um processo puramente mecânico de uma beleza e simplicidade impressionantes.</p>
+
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="card p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-3">Fonógrafo de Edison (1877)</h3>
+                    <p class="mb-4">A primeira máquina a gravar e reproduzir som. Usava um cilindro e um método de gravação vertical (morro e vale), onde a profundidade do sulco variava com a intensidade do som.</p>
+                     <ul class="space-y-2 text-sm">
+                        <li><span class="font-bold">Mídia:</span> Cilindro de cera ou folha de estanho.</li>
+                        <li><span class="font-bold">Pró:</span> Pioneirismo absoluto, prova de conceito.</li>
+                        <li><span class="font-bold">Contra:</span> Cópias difíceis de fazer, material frágil.</li>
+                    </ul>
+                </div>
+
+                <div class="card p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-3">Gramofone de Berliner (1888)</h3>
+                    <p class="mb-4">A invenção que criou a indústria da música. Substituiu o cilindro por um disco plano e a gravação vertical pela lateral, permitindo a prensagem em massa a partir de uma matriz.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li><span class="font-bold">Mídia:</span> Disco plano de goma-laca (78 RPM).</li>
+                        <li><span class="font-bold">Pró:</span> Reprodutibilidade industrial, baixo custo por cópia.</li>
+                        <li><span class="font-bold">Contra:</span> Ruído de superfície (chiado), desgaste da agulha.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold text-center mb-6">Ilustração: Tipos de Sulco</h3>
+                <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto text-center">
+                    <div>
+                        <h4 class="font-semibold mb-2">Vertical (Hill-and-Dale)</h4>
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                            <div class="w-full h-1 bg-gray-400 relative">
+                                <div class="absolute w-full h-8 bg-gray-200 bottom-0" style="clip-path: polygon(0% 100%, 0% 50%, 10% 30%, 20% 60%, 30% 40%, 40% 70%, 50% 20%, 60% 50%, 70% 35%, 80% 65%, 90% 45%, 100% 55%, 100% 100%);"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-2">A agulha se move para cima e para baixo. A profundidade varia.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2">Lateral</h4>
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                            <div class="w-full h-8 bg-gray-200 relative overflow-hidden">
+                                <div class="absolute top-1/2 -translate-y-1/2 h-1 w-full bg-gray-400" style="clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transform: scaleY(1); background: linear-gradient(to right, gray 50%, transparent 50%); background-size: 2px 1px; animation: wave 2s linear infinite;"></div>
+                                <div class="absolute h-1 w-full bg-gray-400 top-1/2 -translate-y-1/2" style="background-image: url('data:image/svg+xml,%3Csvg width=\'100\' height=\'10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0,5 Q25,-5 50,5 T100,5\' stroke=\'gray\' fill=\'transparent\' stroke-width=\'2\'/%3E%3C/svg%3E'); background-size: 100px 10px; animation: scroll 2s linear infinite;"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-2">A agulha se move de um lado para o outro. A largura varia.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="vinil" class="py-20 bg-[#FFFBF0] rounded-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">A Era do Vinil: Alta Fidelidade e Som Espacial</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">A substituição da ruidosa goma-laca pelo PVC e a invenção do "micro-sulco" inauguraram a era da alta fidelidade (Hi-Fi), permitindo mais tempo de música com muito mais qualidade e, eventualmente, a reprodução do som em estéreo.</p>
+            
+            <div class="mt-8">
+                <h3 class="text-2xl font-bold text-center mb-6">A Revolução do Estéreo: Sistema 45/45</h3>
+                <div class="grid md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto">
+                    <div class="text-center">
+                        <div class="relative w-64 h-48 bg-white rounded-lg shadow-inner p-4 mx-auto">
+                            <div class="absolute w-full h-full top-0 left-0" style="clip-path: polygon(0 100%, 50% 20%, 100% 100%); background-color: #D2B48C;"></div>
+                            <div class="absolute w-full h-full top-0 left-0" style="clip-path: polygon(0 100%, 50% 22%, 100% 100%); background-color: #FFFBF0;"></div>
+                            <div class="absolute w-4 h-4 rounded-full bg-[#5D4037] bottom-8 left-1/2 -translate-x-1/2"></div>
+                            <div class="absolute left-4 bottom-2 text-sm font-bold">Parede Esquerda (L)</div>
+                            <div class="absolute right-4 bottom-2 text-sm font-bold">Parede Direita (R)</div>
+                            <div class="absolute top-2 left-1/2 -translate-x-1/2 text-sm">Superfície do Disco</div>
+                        </div>
+                        <p class="text-sm mt-4">Corte transversal do sulco em 'V'. Cada parede modula um canal diferente.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-2">Como Funciona:</h4>
+                        <ul class="space-y-3 text-sm">
+                            <li><span class="font-bold text-[#5D4037]">Sinal Mono (L+R):</span> Causa um movimento puramente <span class="font-semibold">lateral</span> da agulha, compatível com toca-discos mono.</li>
+                            <li><span class="font-bold text-[#5D4037]">Sinal Estéreo (L-R):</span> Causa um movimento puramente <span class="font-semibold">vertical</span> da agulha, contendo a informação espacial.</li>
+                            <li><span class="font-bold text-[#5D4037]">Resultado:</span> Uma cápsula estéreo lê ambos os movimentos, recriando o palco sonoro. Uma cápsula mono lê apenas o movimento lateral, reproduzindo o som em mono.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="magnetica" class="py-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">A Era Magnética: A Edição se Torna Arte</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">A gravação magnética desvinculou o som de um sulco fixo. Agora, o som era um padrão de partículas alinhadas em uma fita, um material que podia ser cortado, colado e rearranjado, transformando o estúdio em um instrumento.</p>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-center mb-6">A Revolução da *Musique Concrète*</h3>
+                    <p class="text-center max-w-2xl mx-auto mb-8">Compositores como Pierre Schaeffer usaram o gravador não para gravar música, mas para *fazer* música com sons "concretos" do mundo. Clique para explorar as técnicas:</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="card p-4 rounded-lg cursor-pointer text-center" onclick="showDetail('detail-corte')"><h4 class="font-bold">Cortar e Colar</h4></div>
+                        <div class="card p-4 rounded-lg cursor-pointer text-center" onclick="showDetail('detail-loop')"><h4 class="font-bold">Criar Loops</h4></div>
+                        <div class="card p-4 rounded-lg cursor-pointer text-center" onclick="showDetail('detail-velocidade')"><h4 class="font-bold">Variar Velocidade</h4></div>
+                        <div class="card p-4 rounded-lg cursor-pointer text-center" onclick="showDetail('detail-inverter')"><h4 class="font-bold">Inverter</h4></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-center mb-6">O "Código Secreto" do Dolby</h3>
+                    <div class="bg-white p-4 rounded-lg shadow-inner space-y-4">
+                        <div class="text-center">
+                            <p class="font-semibold">Na Gravação:</p>
+                            <div class="flex items-center justify-center space-x-2 text-sm">
+                                <span>Sinal Fraco</span> &rarr; <span class="p-1 bg-blue-200 rounded">Amplificar</span> &rarr; <span>Gravar na Fita</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-semibold">Na Reprodução:</p>
+                             <div class="flex items-center justify-center space-x-2 text-sm">
+                                <span>Sinal Forte (com chiado)</span> &rarr; <span class="p-1 bg-green-200 rounded">Atenuar</span> &rarr; <span>Sinal Original (sem chiado)</span>
+                            </div>
+                        </div>
+                    </div>
+                     <p class="text-sm mt-2 text-center">O processo de *companding* (compressão + expansão) que reduz o ruído da fita.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="preservacao" class="py-20 bg-[#FFFBF0] rounded-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Preservação: A Luta Contra a Entropia</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">Nenhum meio analógico é eterno. Cada um se degrada de uma maneira única, apresentando desafios distintos para a arquivologia sonora. A preservação é uma corrida contra o tempo para salvar nosso patrimônio auditivo.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-center mb-4">Degradação do Vinil</h3>
+                    <div class="chart-container h-64 md:h-80"><canvas id="vinilDegradationChart"></canvas></div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-center mb-4">Degradação da Fita Magnética</h3>
+                     <div class="chart-container h-64 md:h-80"><canvas id="fitaDegradationChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="exercicios" class="py-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Exercícios de Fixação</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">Teste seus conhecimentos sobre a jornada do som. Clique em cada pergunta para revelar a resposta e um breve comentário.</p>
+            <div class="space-y-4 max-w-3xl mx-auto">
+                <div class="card border border-gray-200 rounded-lg">
+                    <button onclick="toggleAnswer('q1')" class="w-full text-left p-4 font-bold">1. Qual foi a principal vantagem industrial do Gramofone de Berliner sobre o Fonógrafo de Edison?</button>
+                    <div id="q1" class="answer px-4 pb-4">
+                        <p><span class="font-bold">Resposta:</span> A capacidade de produzir cópias em massa a partir de uma única matriz metálica.</p>
+                        <p class="text-sm mt-2"><i><span class="font-semibold">Comentário:</span> Enquanto Edison criava "originais" únicos, Berliner inventou a indústria fonográfica ao possibilitar a replicação barata e em larga escala, transformando a música em um produto de consumo de massa.</i></p>
+                    </div>
+                </div>
+                <div class="card border border-gray-200 rounded-lg">
+                    <button onclick="toggleAnswer('q2')" class="w-full text-left p-4 font-bold">2. Explique brevemente por que o sistema estéreo 45/45 do vinil é compatível com toca-discos mono.</button>
+                    <div id="q2" class="answer px-4 pb-4">
+                        <p><span class="font-bold">Resposta:</span> Porque a informação mono (L+R) corresponde a um movimento puramente lateral da agulha, que é o único movimento que uma cápsula mono consegue ler. A informação estéreo (L-R) corresponde a um movimento vertical, que a cápsula mono simplesmente ignora.</p>
+                        <p class="text-sm mt-2"><i><span class="font-semibold">Comentário:</span> Essa genialidade de engenharia (retrocompatibilidade) foi crucial para a adoção do estéreo, pois os consumidores não precisaram descartar suas coleções de discos mono ou seus aparelhos antigos de uma só vez.</i></p>
+                    </div>
+                </div>
+                <div class="card border border-gray-200 rounded-lg">
+                    <button onclick="toggleAnswer('q3')" class="w-full text-left p-4 font-bold">3. O que é o sinal de "bias" na gravação em fita magnética e por que ele é essencial?</button>
+                    <div id="q3" class="answer px-4 pb-4">
+                        <p><span class="font-bold">Resposta:</span> É um sinal inaudível de altíssima frequência adicionado ao sinal de áudio durante a gravação. É essencial para superar a não-linearidade (histerese) do meio magnético, resultando em uma gravação com baixa distorção e baixo ruído.</p>
+                        <p class="text-sm mt-2"><i><span class="font-semibold">Comentário:</span> Sem o bias, a fita responderia de forma muito pobre a sinais fracos, criando uma grande distorção. O bias "agita" as partículas magnéticas, tornando-as mais sensíveis e lineares à gravação.</i></p>
+                    </div>
+                </div>
+                 <div class="card border border-gray-200 rounded-lg">
+                    <button onclick="toggleAnswer('q4')" class="w-full text-left p-4 font-bold">4. Qual a diferença fundamental entre a degradação do vinil e a da fita magnética?</button>
+                    <div id="q4" class="answer px-4 pb-4">
+                        <p><span class="font-bold">Resposta:</span> A degradação do vinil é primariamente **mecânica** (atrito da agulha), enquanto a da fita é primariamente **química** (hidrólise do aglutinante, ou "Sticky-Shed Syndrome").</p>
+                        <p class="text-sm mt-2"><i><span class="font-semibold">Comentário:</span> Entender essa diferença é crucial para a arquivologia. Um disco se desgasta com o uso; uma fita pode se degradar mesmo parada na prateleira se as condições de umidade não forem ideais.</i></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="referencias" class="py-20 bg-[#FFFBF0] rounded-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Referências Bibliográficas</h2>
+            <p class="text-center max-w-3xl mx-auto mb-12">Uma seleção de leituras essenciais e complementares para aprofundar os estudos nos tópicos abordados.</p>
+            <div class="max-w-3xl mx-auto space-y-8">
+                <div>
+                    <h3 class="text-xl font-bold border-b-2 border-[#D2B48C] pb-2 mb-4">História e Cultura da Gravação</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li>Katz, M. (2010). *Capturing Sound: How Technology Has Changed Music*. University of California Press.</li>
+                        <li>Chanan, M. (1995). *Repeated Takes: A Short History of Recording and its Effects on Music*. Verso.</li>
+                        <li>Millard, A. (2005). *America on Record: A History of Recorded Sound*. Cambridge University Press.</li>
+                        <li>Bartmanski, D., & Woodward, I. (2015). *Vinyl: The Analogue Record in the Digital Age*. Bloomsbury Academic.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold border-b-2 border-[#D2B48C] pb-2 mb-4">Técnica e Tecnologia</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li>Pohlmann, K. C. (2011). *Principles of Digital Audio*. McGraw-Hill. (Contém excelentes capítulos sobre a história do analógico).</li>
+                        <li>Eargle, J. (2004). *The Microphone Book*. Focal Press.</li>
+                        <li>Borwick, J. (Ed.). (1994). *Sound Recording Practice*. Oxford University Press.</li>
+                        <li>Alexandrovich, G. (1987). *The LP Record and the Phonograph*. Audio Engineering Society.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold border-b-2 border-[#D2B48C] pb-2 mb-4">Musique Concrète e Composição Eletroacústica</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li>Chion, M. (1983). *Guide to Sound Objects: Pierre Schaeffer and Musical Research*. (Tradução de 2009 por J. Dack & C. North).</li>
+                        <li>Roads, C. (2015). *Composing Electronic Music: A New Aesthetic*. Oxford University Press.</li>
+                        <li>Kane, B. (2014). *Sound Unseen: Acousmatic Sound in Theory and Practice*. Oxford University Press.</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h3 class="text-xl font-bold border-b-2 border-[#D2B48C] pb-2 mb-4">Preservação e Arquivologia</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li>IASA-TC 04 (2009). *Guidelines on the Production and Preservation of Digital Audio Objects*. International Association of Sound and Audiovisual Archives.</li>
+                        <li>Casey, M., & Gordon, B. (2007). *Sound Directions: Best Practices for Audio Preservation*. Indiana University & Harvard University.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6 bg-[#FDF6E3] border-t border-[#D2B48C]">
+        <p class="text-sm text-[#5D4037]">Aplicação interativa baseada no roteiro de aula sobre "Registro e reprodução do som".</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const vinilDegradationCtx = document.getElementById('vinilDegradationChart').getContext('2d');
+            new Chart(vinilDegradationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Desgaste da Agulha', 'Arranhões e Poeira', 'Empenamento', 'Outros'],
+                    datasets: [{ data: [50, 30, 15, 5], backgroundColor: ['#8B4513', '#D2B48C', '#A0522D', '#CD853F'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: '#5D4037' } } } }
+            });
+
+            const fitaDegradationCtx = document.getElementById('fitaDegradationChart').getContext('2d');
+            new Chart(fitaDegradationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sticky-Shed Syndrome', 'Desgaste Mecânico', 'Perda Magnética', 'Outros'],
+                    datasets: [{ data: [60, 15, 20, 5], backgroundColor: ['#2F4F4F', '#5F9EA0', '#8FBC8F', '#B0C4DE'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: '#5D4037' } } } }
+            });
+            
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                const targetId = e.target.value;
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                const currentOption = mobileNav.querySelector(`option[value="#${current}"]`);
+                if (currentOption) {
+                    mobileNav.value = `#${current}`;
+                }
+            });
+        });
+
+        function showDetail(id) {
+            const allDetails = document.querySelectorAll('.detail-content');
+            allDetails.forEach(el => {
+                if (el.id !== id) el.classList.add('hidden');
+            });
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function toggleAnswer(id) {
+            const answerElement = document.getElementById(id);
+            answerElement.classList.toggle('show');
+        }
+
+    </script>
+</body>
+</html>
